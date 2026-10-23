@@ -1,0 +1,13 @@
+# Local SQLite database and backups
+data/*.sqlite
+data/*.sqlite-shm
+data/*.sqlite-wal
+data/*.db
+data/*.db-*
+
+# Runtime / temporary files
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
