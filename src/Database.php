@@ -36,24 +36,66 @@ final class Database
             )
         SQL);
 
-        $count = (int) $this->pdo->query('SELECT COUNT(*) FROM readings')->fetchColumn();
-        if ($count === 0) {
-            $insert = $this->pdo->prepare('INSERT INTO readings (reading_date, sector, water_produced, water_billed, energy_kwh, notes) VALUES (?, ?, ?, ?, ?, ?)');
-            $samples = [
-                ['2026-09-01', 'Setor Norte', 12000, 10100, 850, 'Medição de referência'],
-                ['2026-09-02', 'Setor Sul', 9800, 8100, 730, 'Operação normal'],
-                ['2026-09-03', 'Setor Central', 15400, 13300, 1120, ''],
-                ['2026-09-04', 'Setor Norte', 12500, 10300, 890, 'Verificar variação'],
-                ['2026-09-05', 'Setor Sul', 10200, 8500, 745, ''],
-                ['2026-09-06', 'Setor Central', 14900, 12800, 1090, ''],
-                ['2026-09-07', 'Setor Norte', 11800, 9900, 820, ''],
-                ['2026-09-08', 'Setor Sul', 10400, 8600, 760, ''],
-                ['2026-09-09', 'Setor Central', 15800, 13400, 1150, 'Pico de demanda'],
-                ['2026-09-10', 'Setor Norte', 12100, 10200, 840, ''],
-            ];
+        $this->pdo->exec(<<<'SQL'
+            CREATE TABLE IF NOT EXISTS app_metadata (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )
+        SQL);
+
+        $count = (int) $this->pdo->query(
+            'SELECT COUNT(*) FROM readings'
+        )->fetchColumn();
+
+        if ($count > 0) {
+            $stmt = $this->pdo->prepare(
+                'INSERT OR IGNORE INTO app_metadata (key, value) VALUES (?, ?)'
+            );
+            $stmt->execute(['sample_data_seeded', '1']);
+        }
+
+        $check = $this->pdo->prepare(
+            'SELECT value FROM app_metadata WHERE key = ?'
+        );
+        $check->execute(['sample_data_seeded']);
+
+        if ($check->fetchColumn() === '1') {
+            return;
+        }
+
+        $samples = [
+            ['2026-09-01', 'Setor Norte', 12000, 10100, 850, 'Medição de referência'],
+            ['2026-09-02', 'Setor Sul', 9800, 8100, 730, 'Operação normal'],
+            ['2026-09-03', 'Setor Central', 15400, 13300, 1120, ''],
+            ['2026-09-04', 'Setor Norte', 12500, 10300, 890, 'Verificar variação'],
+            ['2026-09-05', 'Setor Sul', 10200, 8500, 745, ''],
+            ['2026-09-06', 'Setor Central', 14900, 12800, 1090, ''],
+            ['2026-09-07', 'Setor Norte', 11800, 9900, 820, ''],
+            ['2026-09-08', 'Setor Sul', 10400, 8600, 760, ''],
+            ['2026-09-09', 'Setor Central', 15800, 13400, 1150, 'Pico de demanda'],
+            ['2026-09-10', 'Setor Norte', 12100, 10200, 840, ''],
+        ];
+
+        $this->pdo->beginTransaction();
+
+        try {
+            $insert = $this->pdo->prepare(
+                'INSERT INTO readings (reading_date, sector, water_produced, water_billed, energy_kwh, notes) VALUES (?, ?, ?, ?, ?, ?)'
+            );
+
             foreach ($samples as $sample) {
                 $insert->execute($sample);
             }
+
+            $mark = $this->pdo->prepare(
+                'INSERT INTO app_metadata (key, value) VALUES (?, ?)'
+            );
+            $mark->execute(['sample_data_seeded', '1']);
+
+            $this->pdo->commit();
+        } catch (Throwable $exception) {
+            $this->pdo->rollBack();
+            throw $exception;
         }
     }
 

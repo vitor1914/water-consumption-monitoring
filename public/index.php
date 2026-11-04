@@ -42,7 +42,6 @@ $from = trim((string)($_GET['from'] ?? ''));
 $to = trim((string)($_GET['to'] ?? ''));
 $sectorFilter = trim((string)($_GET['sector'] ?? ''));
 $readings = $db->all($from, $to, $sectorFilter);
-$allReadings = $db->all($from, $to, $sectorFilter);
 $totalProduced = array_sum(array_column($readings, 'water_produced'));
 $totalBilled = array_sum(array_column($readings, 'water_billed'));
 $totalEnergy = array_sum(array_column($readings, 'energy_kwh'));
