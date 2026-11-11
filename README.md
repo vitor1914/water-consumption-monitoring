@@ -1,154 +1,190 @@
-# HidroDados — Monitoramento de Consumo e Perdas de Água
+# HidroDados — Sistema de Monitoramento de Água
 
-[Português](#português) | [English](#english)
+**Sistema web para monitoramento de produção, faturamento, consumo de energia e perdas de água**, desenvolvido em PHP e SQLite.
 
-## Português
+O HidroDados apresenta indicadores operacionais em um dashboard, permite cadastrar e consultar medições e gerar relatórios em CSV.
 
-### Visão geral
+🇧🇷 Português | [English](#english-version)
 
-HidroDados é uma aplicação web demonstrativa em PHP para registrar e analisar indicadores operacionais de abastecimento de água. O painel reúne volumes produzidos e faturados, perdas estimadas, consumo energético, gráficos por data e setor, filtros e exportação CSV.
+---
 
-> Os dados iniciais são sintéticos e servem apenas para demonstração. As perdas são calculadas como volume produzido menos volume faturado; essa diferença não substitui uma metodologia oficial de balanço hídrico.
+## Funcionalidades
 
-### Funcionalidades
-
-- Cadastro e exclusão de medições.
-- Persistência em SQLite usando PDO e consultas preparadas.
-- Validação de datas, volumes e campos obrigatórios no servidor.
-- Indicadores de volume produzido, volume faturado, perdas estimadas e intensidade energética.
-- Gráficos de produção/faturamento ao longo do tempo e perdas estimadas por setor.
+- Dashboard com indicadores de produção, faturamento, perdas estimadas e energia consumida.
+- Cadastro de medições de água por data e setor.
+- Exclusão de registros.
 - Filtros por período e setor.
-- Exportação dos registros filtrados para CSV.
-- Token CSRF para formulários e escape de saída HTML.
-- Interface responsiva para desktop e dispositivos móveis.
+- Gráfico de produção versus volume faturado.
+- Gráfico de perdas estimadas por setor.
+- Cálculo automático do volume e percentual de perdas.
+- Cálculo da intensidade energética por metro cúbico produzido.
+- Exportação de relatórios em CSV.
+- Persistência dos dados utilizando SQLite.
 
-### Tecnologias
+## Tecnologias utilizadas
 
-- PHP 8.1 ou superior
-- PDO SQLite (`pdo_sqlite`)
+- PHP 8.3
 - SQLite
-- HTML5 e CSS3
-- JavaScript e Chart.js (carregado via CDN)
+- PDO
+- HTML5
+- CSS3
+- JavaScript
+- Chart.js
 
-### Requisitos no Ubuntu
+## Indicadores calculados
 
-```bash
-sudo apt update
-sudo apt install php-cli php-sqlite3
-```
+| Indicador | Cálculo |
+|---|---|
+| Perdas estimadas | Volume produzido − volume faturado |
+| Taxa de perdas | Perdas estimadas ÷ volume produzido × 100 |
+| Intensidade energética | Energia consumida ÷ volume produzido |
 
-Verifique as extensões:
-
-```bash
-php -v
-php -m | grep -E 'PDO|pdo_sqlite|sqlite3'
-```
-
-### Executar localmente
-
-Na pasta raiz do projeto:
-
-```bash
-php -S 127.0.0.1:8000 -t public
-```
-
-Abra `http://127.0.0.1:8000` no navegador. O banco SQLite será criado automaticamente em `data/monitoramento.sqlite`, com dados demonstrativos inseridos na primeira execução.
-
-### Estrutura
+## Estrutura do projeto
 
 ```text
 monitoramento-agua-php/
-├── data/                 # Banco SQLite criado durante a execução
+├── data/
+│   └── .gitkeep
 ├── public/
-│   ├── assets/style.css
+│   ├── assets/
+│   │   └── style.css
 │   └── index.php
-├── src/Database.php
+├── src/
+│   └── Database.php
 ├── .gitignore
 └── README.md
 ```
 
-### Indicadores utilizados
+O banco SQLite é utilizado para armazenar as medições e é inicializado pela aplicação quando necessário.
 
-- **Perdas estimadas (m³):** volume produzido − volume faturado.
-- **Taxa de perdas (%):** perdas estimadas ÷ volume produzido × 100.
-- **Intensidade energética (kWh/m³):** energia consumida ÷ volume produzido.
+## Requisitos
 
-Os indicadores são agregados sobre os registros filtrados. Em aplicações reais, a interpretação exige contexto operacional, validação dos medidores e metodologia aprovada pela organização.
+- PHP 8.3 ou superior.
+- Extensão PDO.
+- Driver PDO SQLite.
+- Extensão SQLite3.
+- Navegador atualizado.
+- Conexão com a internet para carregar o Chart.js pela CDN.
 
-### Exportação
+## Como executar
 
-Clique em **Exportar CSV** para baixar os registros que correspondem aos filtros atuais. O arquivo pode ser aberto em planilhas para análises complementares.
-
-### Observações de segurança e produção
-
-Este projeto foi criado para demonstração e portfólio. O servidor embutido do PHP é destinado a desenvolvimento local, não a exposição pública. Antes de produção, adicione autenticação e autorização, logging, política de backup, proteção de infraestrutura, testes automatizados, controles de acesso e revisão de segurança. O gráfico usa Chart.js por CDN e requer conexão com a internet para carregar a biblioteca.
-
----
-
-## English
-
-### Overview
-
-HidroDados is a demonstration PHP web application for recording and analyzing operational water-supply indicators. The dashboard combines produced and billed volumes, estimated losses, energy consumption, charts by date and sector, filters, and CSV export.
-
-> Initial records are synthetic and intended for demonstration only. Estimated losses are calculated as produced volume minus billed volume; this difference is not a substitute for an official water-balance methodology.
-
-### Features
-
-- Create and delete measurement records.
-- SQLite persistence through PDO and prepared statements.
-- Server-side validation for dates, volumes, and required fields.
-- KPIs for produced volume, billed volume, estimated losses, and energy intensity.
-- Charts for production versus billing over time and estimated losses by sector.
-- Date-range and sector filters.
-- CSV export for filtered records.
-- CSRF tokens for forms and HTML output escaping.
-- Responsive desktop and mobile layout.
-
-### Technology stack
-
-- PHP 8.1 or later
-- PDO SQLite (`pdo_sqlite`)
-- SQLite
-- HTML5 and CSS3
-- JavaScript and Chart.js (loaded from a CDN)
-
-### Ubuntu requirements
+Clone o repositório:
 
 ```bash
-sudo apt update
-sudo apt install php-cli php-sqlite3
+git clone https://github.com/vitor1914/monitoramento-agua-php.git
 ```
 
-Check the runtime and extensions:
+Entre na pasta:
+
+```bash
+cd monitoramento-agua-php
+```
+
+Verifique a versão do PHP:
 
 ```bash
 php -v
-php -m | grep -E 'PDO|pdo_sqlite|sqlite3'
 ```
 
-### Run locally
+Verifique as extensões necessárias:
 
-From the project root:
+```bash
+php -m | grep -Ei 'PDO|pdo_sqlite|sqlite3'
+```
+
+Inicie o servidor de desenvolvimento:
 
 ```bash
 php -S 127.0.0.1:8000 -t public
 ```
 
-Open `http://127.0.0.1:8000` in your browser. The SQLite database is automatically created at `data/monitoramento.sqlite`, and sample records are inserted on the first run.
+Acesse no navegador:
 
-### Key metrics
+```text
+http://127.0.0.1:8000
+```
 
-- **Estimated losses (m³):** produced volume − billed volume.
-- **Loss rate (%):** estimated losses ÷ produced volume × 100.
-- **Energy intensity (kWh/m³):** energy consumption ÷ produced volume.
+## Validações e cuidados de segurança
 
-Metrics are aggregated over the filtered records. In real-world deployments, interpretation requires operational context, meter validation, and an organization-approved methodology.
+O projeto utiliza:
 
-### Export
+- PDO com consultas preparadas.
+- Validação dos dados recebidos nos formulários.
+- Token CSRF nas operações via formulário.
+- Escape de conteúdo HTML com `htmlspecialchars`.
+- Validação de valores numéricos e datas.
+- Restrições para evitar registros com valores negativos ou volume faturado superior ao produzido.
+- Integridade referencial e índices no SQLite.
 
-Select **Exportar CSV** to download records matching the current filters. The file can be opened in spreadsheet software for further analysis.
+## Verificações realizadas
 
-### Security and production notes
+- Verificação de sintaxe PHP com `php -l`.
+- Verificação de integridade do banco SQLite.
+- Conferência dos índices da tabela de medições.
+- Teste de inicialização do servidor PHP.
+- Requisição HTTP local com resposta `200`.
+- Confirmação da preservação dos 10 registros de demonstração existentes durante as verificações.
 
-This project is intended for demonstration and portfolio use. PHP's built-in server is for local development, not public deployment. Before production, add authentication and authorization, logging, backup policies, infrastructure protections, automated tests, access controls, and a security review. The charts load Chart.js from a CDN and therefore require an internet connection.
+## Objetivo do projeto
+
+Este projeto demonstra a aplicação de conhecimentos de desenvolvimento web, modelagem e manipulação de banco de dados, validação de dados e visualização de indicadores.
+
+Foi desenvolvido como projeto de portfólio, utilizando dados de demonstração.
+
+---
+
+# English Version
+
+## HidroDados — Water Monitoring System
+
+A web application for monitoring water production, billed volume, estimated losses, and energy consumption.
+
+The system provides an operational dashboard, measurement management, data filtering, charts, and CSV reports.
+
+### Features
+
+- Dashboard with operational KPIs.
+- Water measurement registration and deletion.
+- Filtering by date and sector.
+- Production versus billed volume chart.
+- Estimated losses by sector chart.
+- Automatic water loss calculations.
+- Energy intensity calculation.
+- CSV report export.
+- SQLite database persistence.
+
+### Technologies
+
+- PHP 8.3
+- SQLite
+- PDO
+- HTML5
+- CSS3
+- JavaScript
+- Chart.js
+
+### Run locally
+
+```bash
+git clone https://github.com/vitor1914/monitoramento-agua-php.git
+
+cd monitoramento-agua-php
+
+php -S 127.0.0.1:8000 -t public
+```
+
+Open:
+
+```text
+http://127.0.0.1:8000
+```
+
+### Project Purpose
+
+This project demonstrates practical skills in PHP development, database management, data validation, operational metrics, and data visualization.
+
+It was developed as a portfolio project using demonstration data.
+
+---
+
+**GitHub:** [vitor1914](https://github.com/vitor1914)
